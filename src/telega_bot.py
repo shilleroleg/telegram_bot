@@ -44,9 +44,9 @@ def callback_inline(call):
         if call.message:
             if call.data == 'Nsk':
                 get_weather('Novosibirsk')
-                bot.send_message(call.message.chat.id, 'Вот и отличненько 😊')
+                bot.send_message(call.message.chat.id, 'Вот и отличненько')
             elif call.data == 'Other':
-                bot.send_message(call.message.chat.id, 'Бывает 😢')
+                bot.send_message(call.message.chat.id, 'Бывает')
 
             # remove inline buttons
             bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
