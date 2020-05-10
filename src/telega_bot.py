@@ -1,9 +1,9 @@
 import telebot as tb
 import config
-import get_weather as getw
+import getweather as getw
 
 # Создаем бота
-bot = tb.TeleBot(config.TOKEN)
+bot = tb.TeleBot(config.TELEGRAM)
 
 
 # Если послать боту комманду /start
