@@ -19,7 +19,6 @@ def weather(place='Novosibirsk'):
     lon = location.get_lon()
     lat = location.get_lat()
     loc_id = location.get_ID()
-    print(lon, lat)
 
     # Weather details
     time = w.get_reference_time(timeformat='date')  # get time of observation as a datetime.datetime object
@@ -27,8 +26,6 @@ def weather(place='Novosibirsk'):
     wind = w.get_wind()  # {'speed': 4.6, 'deg': 330}
     humidity = w.get_humidity()  # 87
     temper = w.get_temperature('celsius')  # {'temp_max': 10.5, 'temp': 9.7, 'temp_min': 9.0}
-
-    # print(f"time: {time}\nwind: {wind} \nhumidity: {humidity}\ntemperature: {temper}")
 
     clouds = w.get_clouds()  # Get cloud coverage 65
     rain = w.get_rain()  # Get rain volume {'3h': 0}
@@ -49,15 +46,13 @@ def weather(place='Novosibirsk'):
                    'sunrise': sunrise,
                    'sunset': sunset}
 
-    # print(clouds, rain, snow, pressure, det_status, sunrise, sunset)
-
     # The query returns an UV Index value entity instance
     # https://en.wikipedia.org/wiki/Ultraviolet_index
     uvi = owm.uvindex_around_coords(lat, lon)
 
     uv_val = uvi.get_value()
     uv_risk = uvi.get_exposure_risk()  # methods returns a string estimating the risk of harm from unprotected sun exposure if an average adult was exposed to a UV intensity such as the on in this measurement.
-    # print(uv_val, uv_risk)
+
     return_dict['uv_val'] = uv_val
     return_dict['uv_risk'] = uv_risk
 
