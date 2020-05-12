@@ -1,11 +1,18 @@
 import telebot as tb
+import os
+from flask import Flask, request
+import logging
+from random import choice
 import config
 import getweather as getw
-from random import choice
 
 # Создаем бота
 bot = tb.TeleBot(config.TOKEN_TELEGRAM)
 
+server = Flask(__name__)
+
+logger = tb.logger
+tb.logger.setLevel(logging.INFO)
 
 # Если послать боту комманду /start
 # то отправит сообщение и покажет клавиатуру с кнопками
@@ -32,8 +39,6 @@ def send_text(message):
         bot.send_sticker(message.chat.id, choice_sticker())
 
     elif message.text.lower() == "погода":
-        print("Погода")
-
         keyboard = tb.types.InlineKeyboardMarkup(row_width=2)
         item1 = tb.types.InlineKeyboardButton("Новосибирск", callback_data='Nsk')
         item2 = tb.types.InlineKeyboardButton("Другой город", callback_data='Other')
@@ -108,6 +113,7 @@ def choice_sticker():
 
 def get_weather(place):
     weath_dict = getw.weather(place)
+    str0 = place + "\n"
     str1 = "Температура: {0} C\nВлажность: {1}%\n".format(str(weath_dict['temperature']),
                                                           str(weath_dict['humidity']))
     str2 = "Давление {0} мм.рт.ст\nВетер: {1} м/с\n".format(str(round(weath_dict['pressure'] / 1.33322, 1)),
@@ -117,4 +123,20 @@ def get_weather(place):
     return str1 + str2 + str3
 
 
-bot.polling()
+@server.route("/bot", methods=['POST'])
+def getMessage():
+    bot.process_new_updates([tb.types.Update.de_json(request.stream.read().decode("utf-8"))])
+    return "!", 200
+
+
+@server.route("/")
+def webhook():
+    bot.remove_webhook()
+    bot.set_webhook(url="https://young-hamlet-55059.herokuapp.com/bot")
+    return "?", 200
+
+# bot.polling()
+
+
+if __name__ == "__main__":
+    server.run(host="0.0.0.0", port=os.environ.get('PORT', 5000))
