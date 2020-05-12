@@ -25,7 +25,7 @@ def get_usd_eur():
 	# Время в Unix Timestamp
 	timestamp_unix = answer_json['timestamp']
 	# Преобразуем в формат 2020-05-10 23:00:05
-	time = datetime.datetime.fromtimestamp(timestamp_unix)
+	time = datetime.datetime.fromtimestamp(timestamp_unix) + datetime.timedelta(hours=7)
 
 	return_dict = {'time': time, 'usd': usd_rub, 'eur': eur_rub}
 

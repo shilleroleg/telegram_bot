@@ -4,6 +4,7 @@ from flask import Flask, request
 from random import choice
 import config
 import getweather as getw
+import currencies
 
 # Создаем бота
 bot = tb.TeleBot(config.TOKEN_TELEGRAM)
@@ -45,9 +46,14 @@ def send_text(message):
     elif message.text.lower() == "прогноз":
         pass
     elif message.text.lower() == "курс":
-        pass
+        curr = currencies.get_usd_eur()
+        ans = "Курс валют на: {0}\nДоллар: {1}\nЕвро: {2}".format(str(curr['time']),
+                                                                  str(curr['usd']),
+                                                                  str(curr['eur']))
+        bot.send_message(message.chat.id, ans)
+
     else:                                          # Повторяет сообщение в ответ
-        bot.send_message(message.chat.id, message.text)
+        bot.send_message(message.chat.id, "Ты сказал - " + message.text + "?")
 
 
 @bot.callback_query_handler(func=lambda call: True)
@@ -113,11 +119,11 @@ def get_weather(place):
     str0 = place + "\n"
     str1 = "Температура: {0} C\nВлажность: {1}%\n".format(str(weath_dict['temperature']),
                                                           str(weath_dict['humidity']))
-    str2 = "Давление {0} мм.рт.ст\nВетер: {1} м/с\n".format(str(round(weath_dict['pressure'] / 1.33322, 1)),
+    str2 = "Давление {0} мм.рт.ст\nВетер: {1} м/с\n".format(str(int(weath_dict['pressure'] / 1.33322)),
                                                             str(weath_dict['wind']))
     str3 = "UV-индекс: {0}\nUV-риск: {1}\n".format(str(weath_dict['uv_val']),
                                                    str(weath_dict['uv_risk']))
-    return str1 + str2 + str3
+    return str0 + str1 + str2 + str3
 
 
 @server.route("/" + config.TOKEN_TELEGRAM, methods=['POST'])

@@ -1,4 +1,5 @@
 import pyowm
+import datetime as dt
 import config
 
 # Current weather, minute forecast for 1 hour, hourly forecast for 48 hours,
@@ -21,7 +22,8 @@ def weather(place='Novosibirsk'):
     loc_id = location.get_ID()
 
     # Weather details
-    time = w.get_reference_time(timeformat='date')  # get time of observation as a datetime.datetime object
+    time = w.get_reference_time(timeformat='date')  # get time of observation as a datetime.datetime object in UTC
+    time += dt.timedelta(hours=7)   # Время в Нск относительно  UTC
 
     wind = w.get_wind()  # {'speed': 4.6, 'deg': 330}
     humidity = w.get_humidity()  # 87
@@ -30,11 +32,13 @@ def weather(place='Novosibirsk'):
     clouds = w.get_clouds()  # Get cloud coverage 65
     rain = w.get_rain()  # Get rain volume {'3h': 0}
     snow = w.get_snow()  # Get snow volume {}
-    pressure = w.get_pressure()  # Get atmospheric pressure {'press': 1009, 'sea_level': 1038.381}
+    pressure = w.get_pressure()  # Get pressure {'press': 1009, 'sea_level': 1038.381} in mm.hg
     status = w.get_status()  # Get weather short status 'clouds'
     det_status = w.get_detailed_status()  # Get detailed weather status 'Broken clouds'
-    sunrise = w.get_sunrise_time('iso')  # Sunrise time (GMT UNIXtime or ISO 8601) 1377862896L
+    sunrise = w.get_sunrise_time()  # Sunrise time (GMT UNIXtime or ISO 8601) 1377862896L
+    sunrise = dt.datetime.fromtimestamp(sunrise) + dt.timedelta(hours=7)
     sunset = w.get_sunset_time('iso')  # Sunset time (GMT UNIXtime or ISO 8601) '2013-08-30 20:07:57+00'
+    sunset = dt.datetime.fromtimestamp(sunset) + dt.timedelta(hours=7)
 
     return_dict = {'time': time,
                    'temperature': temper['temp'],
@@ -51,7 +55,9 @@ def weather(place='Novosibirsk'):
     uvi = owm.uvindex_around_coords(lat, lon)
 
     uv_val = uvi.get_value()
-    uv_risk = uvi.get_exposure_risk()  # methods returns a string estimating the risk of harm from unprotected sun exposure if an average adult was exposed to a UV intensity such as the on in this measurement.
+    # methods returns a string estimating the risk of harm from unprotected sun exposure
+    # if an average adult was exposed to a UV intensity such as the on in this measurement.
+    uv_risk = uvi.get_exposure_risk()
 
     return_dict['uv_val'] = uv_val
     return_dict['uv_risk'] = uv_risk
@@ -59,7 +65,7 @@ def weather(place='Novosibirsk'):
     return return_dict
 
 
-def forecast(place='Novosibirsk'):
+def forecast_weather(place='Novosibirsk'):
     # forecast
     owm = pyowm.OWM(config.API_KEY_WEATHER, language='ru')
     # Query for 3 hours weather forecast for the next 5 days
@@ -70,17 +76,27 @@ def forecast(place='Novosibirsk'):
     # Get the list of Weather objects...
     # lst = forecast_3h.get_weathers()
     # ...or iterate directly over the Forecast object
-    for weather in forecast_3h:
-        # print (weather.get_reference_time('iso'), weather.get_temperature('celsius'))
-        pass
+    return_dict = {'time': [],
+                   'temperature': [],
+                   'wind': [],
+                   'pressure': [],
+                   'detailed_status': []}
+    for weather_ in forecast_3h:
+        ref_time = dt.datetime.fromtimestamp(weather_.get_reference_time())
+        return_dict['time'].append(ref_time + dt.timedelta(hours=7))  # Время в Нск относительно  UTC
+        return_dict['temperature'].append(weather_.get_temperature('celsius')['temp'])
+        return_dict['wind'].append(weather_.get_wind()['speed'])
+        return_dict['pressure'].append(int(weather_.get_pressure()['press'] / 1.33322))
+        return_dict['detailed_status'].append(weather_.get_detailed_status())
 
     # When in time does the forecast begin?
     fc_3h.when_starts('date')  # datetime.datetime instance
     # ...and when will it end?
     fc_3h.when_ends('date')  # datetime.datetime instance
 
-    return forecast_3h
+    return return_dict
 
 
 if __name__ == '__main__':
-    weather("Сургут")
+    # weather("Novosibirsk")
+    forecast_weather("Novosibirsk")
