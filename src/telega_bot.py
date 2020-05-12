@@ -1,7 +1,6 @@
 import telebot as tb
 import os
 from flask import Flask, request
-import logging
 from random import choice
 import config
 import getweather as getw
@@ -11,8 +10,6 @@ bot = tb.TeleBot(config.TOKEN_TELEGRAM)
 
 server = Flask(__name__)
 
-logger = tb.logger
-tb.logger.setLevel(logging.INFO)
 
 # Если послать боту комманду /start
 # то отправит сообщение и покажет клавиатуру с кнопками
