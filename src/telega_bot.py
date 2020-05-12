@@ -46,11 +46,16 @@ def send_text(message):
     elif message.text.lower() == "прогноз":
         pass
     elif message.text.lower() == "курс":
-        curr = currencies.get_usd_eur()
-        ans = "Курс валют на: {0}\nДоллар: {1}\nЕвро: {2}".format(str(curr['time']),
-                                                                  str(curr['usd']),
-                                                                  str(curr['eur']))
-        bot.send_message(message.chat.id, ans)
+        curr = currencies.get_currencies_pair()
+        ans1 = "Курс валют на: {0}\nДоллар: {1}\nЕвро: {2}\nЮань: {3}".format(str(curr['time']),
+                                                                              str(curr['usd']),
+                                                                              str(curr['eur']),
+                                                                              str(curr['cny']))
+        ans2 = "Фунт: {0}\nГривна: {1}\nБел.руб.: {2}\nБиткоин: {3}$".format(str(curr['gbp']),
+                                                                             str(curr['uah']),
+                                                                             str(curr['byn']),
+                                                                             str(curr['btc']))
+        bot.send_message(message.chat.id, ans1 + ans2)
 
     else:                                          # Повторяет сообщение в ответ
         bot.send_message(message.chat.id, "Ты сказал - " + message.text + "?")
