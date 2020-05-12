@@ -120,7 +120,7 @@ def get_weather(place):
     return str1 + str2 + str3
 
 
-@server.route("/bot", methods=['POST'])
+@server.route("/" + config.TOKEN_TELEGRAM, methods=['POST'])
 def getMessage():
     bot.process_new_updates([tb.types.Update.de_json(request.stream.read().decode("utf-8"))])
     return "!", 200
@@ -129,11 +129,12 @@ def getMessage():
 @server.route("/")
 def webhook():
     bot.remove_webhook()
-    bot.set_webhook(url="https://young-hamlet-55059.herokuapp.com/bot")
-    return "?", 200
+    bot.set_webhook(url="https://young-hamlet-55059.herokuapp.com/" + config.TOKEN_TELEGRAM)
+    return "!", 200
 
 # bot.polling()
 
 
 if __name__ == "__main__":
-    server.run(host="0.0.0.0", port=os.environ.get('PORT', 5000))
+    # server.debug = True
+    server.run(host="0.0.0.0", port=int(os.environ.get('PORT', 5000)))
