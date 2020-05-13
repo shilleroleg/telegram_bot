@@ -47,10 +47,10 @@ def send_text(message):
         pass
     elif message.text.lower() == "курс":
         curr = currencies.get_currencies_pair()
-        ans1 = "Курс валют на: {0}\nДоллар: {1}\nЕвро: {2}\nЮань: {3}".format(str(curr['time']),
-                                                                              str(curr['usd']),
-                                                                              str(curr['eur']),
-                                                                              str(curr['cny']))
+        ans1 = "Курс валют на: {0}\nДоллар: {1}\nЕвро: {2}\nЮань: {3}\n".format(str(curr['time']),
+                                                                                str(curr['usd']),
+                                                                                str(curr['eur']),
+                                                                                str(curr['cny']))
         ans2 = "Фунт: {0}\nГривна: {1}\nБел.руб.: {2}\nБиткоин: {3}$".format(str(curr['gbp']),
                                                                              str(curr['uah']),
                                                                              str(curr['byn']),
@@ -121,7 +121,8 @@ def choice_sticker():
 
 def get_weather(place):
     weath_dict = getw.weather(place)
-    str0 = place + "\n"
+    str0 = place + " {0}\n".format(str(weath_dict['time']))
+
     str1 = "Температура: {0} C\nВлажность: {1}%\n".format(str(weath_dict['temperature']),
                                                           str(weath_dict['humidity']))
     str2 = "Давление {0} мм.рт.ст\nВетер: {1} м/с\n".format(str(int(weath_dict['pressure'] / 1.33322)),
@@ -129,6 +130,9 @@ def get_weather(place):
     str3 = "UV-индекс: {0}\nUV-риск: {1}\n".format(str(weath_dict['uv_val']),
                                                    str(weath_dict['uv_risk']))
     return str0 + str1 + str2 + str3
+
+
+# bot.polling()
 
 
 @server.route("/" + config.TOKEN_TELEGRAM, methods=['POST'])
@@ -143,9 +147,6 @@ def webhook():
     bot.set_webhook(url="https://young-hamlet-55059.herokuapp.com/" + config.TOKEN_TELEGRAM)
     return "!", 200
 
-# bot.polling()
-
 
 if __name__ == "__main__":
-    # server.debug = True
-    server.run(host="0.0.0.0", port=int(os.environ.get('PORT', 5000)))
+    server.run(host="0.0.0.0", port=int(os.environ.get('PORT', 5000)), debug=True)

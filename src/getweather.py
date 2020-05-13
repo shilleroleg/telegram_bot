@@ -37,7 +37,8 @@ def weather(place='Novosibirsk'):
     det_status = w.get_detailed_status()  # Get detailed weather status 'Broken clouds'
     sunrise = w.get_sunrise_time()  # Sunrise time (GMT UNIXtime or ISO 8601) 1377862896L
     sunrise = dt.datetime.fromtimestamp(sunrise) + dt.timedelta(hours=7)
-    sunset = w.get_sunset_time('iso')  # Sunset time (GMT UNIXtime or ISO 8601) '2013-08-30 20:07:57+00'
+    sunset = w.get_sunset_time()  # Sunset time (GMT UNIXtime or ISO 8601) '2013-08-30 20:07:57+00'
+    # print(type(sunset))
     sunset = dt.datetime.fromtimestamp(sunset) + dt.timedelta(hours=7)
 
     return_dict = {'time': time,
@@ -98,5 +99,13 @@ def forecast_weather(place='Novosibirsk'):
 
 
 if __name__ == '__main__':
-    # weather("Novosibirsk")
-    forecast_weather("Novosibirsk")
+    place = "Novosibirsk"
+    weath_dict = weather(place)
+    str0 = place + " {0}\n".format(str(weath_dict['time']))
+
+    str1 = "Температура: {0} C\nВлажность: {1}%\n".format(str(weath_dict['temperature']), str(weath_dict['humidity']))
+    str2 = "Давление {0} мм.рт.ст\nВетер: {1} м/с\n".format(str(int(weath_dict['pressure'] / 1.33322)),
+                                                            str(weath_dict['wind']))
+    str3 = "UV-индекс: {0}\nUV-риск: {1}\n".format(str(weath_dict['uv_val']), str(weath_dict['uv_risk']))
+    print(str0 + str1 + str2 + str3)
+    # forecast_weather("Novosibirsk")
