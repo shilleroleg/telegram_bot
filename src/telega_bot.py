@@ -44,7 +44,13 @@ def send_text(message):
 
         bot.send_message(message.chat.id, "Где смотрим погоду?", reply_markup=keyboard)
     elif message.text.lower() == "прогноз":
-        pass
+        ans_fc = getw.forecast_weather_sparse_list()
+        if ans_fc is not None:
+            bot.send_message(message.chat.id, ans_fc[0])
+            bot.send_message(message.chat.id, ans_fc[1])
+            bot.send_message(message.chat.id, ans_fc[2])
+            bot.send_message(message.chat.id, ans_fc[3])
+            bot.send_message(message.chat.id, ans_fc[4])
     elif message.text.lower() == "курс":
         curr = currencies.get_currencies_pair()
         ans1 = "Курс валют на: {0}\nДоллар: {1}\nЕвро: {2}\nЮань: {3}\n".format(str(curr['time']),
@@ -69,7 +75,7 @@ def callback_inline(call):
                 answer = get_weather('Novosibirsk')
                 bot.send_message(call.message.chat.id, answer)
             elif call.data == 'Other':
-                bot.send_message(call.message.chat.id, 'Бывает')
+                bot.send_message(call.message.chat.id, 'Холодно')
 
             # remove inline buttons
             bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
@@ -149,4 +155,4 @@ def webhook():
 
 
 if __name__ == "__main__":
-    server.run(host="0.0.0.0", port=int(os.environ.get('PORT', 5000)), debug=True)
+    server.run(host="0.0.0.0", port=int(os.environ.get('PORT', 5000)), debug=False)
