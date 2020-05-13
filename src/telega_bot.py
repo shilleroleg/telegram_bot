@@ -44,13 +44,12 @@ def send_text(message):
 
         bot.send_message(message.chat.id, "Где смотрим погоду?", reply_markup=keyboard)
     elif message.text.lower() == "прогноз":
-        ans_fc = getw.forecast_weather_sparse_list()
-        if ans_fc is not None:
-            bot.send_message(message.chat.id, ans_fc[0])
-            bot.send_message(message.chat.id, ans_fc[1])
-            bot.send_message(message.chat.id, ans_fc[2])
-            bot.send_message(message.chat.id, ans_fc[3])
-            bot.send_message(message.chat.id, ans_fc[4])
+        rt_lst = getw.forecast_weather_sparse_list()
+        bot.send_message(message.chat.id, rt_lst[0])
+        # bot.send_message(message.chat.id, rt_lst[1])
+        # bot.send_message(message.chat.id, rt_lst[2])
+        # bot.send_message(message.chat.id, rt_lst[3])
+        # bot.send_message(message.chat.id, rt_lst[4])
     elif message.text.lower() == "курс":
         curr = currencies.get_currencies_pair()
         ans1 = "Курс валют на: {0}\nДоллар: {1}\nЕвро: {2}\nЮань: {3}\n".format(str(curr['time']),
