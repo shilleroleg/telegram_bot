@@ -145,8 +145,8 @@ def forecast_weather_sparse_dict(place_sp='Novosibirsk'):
 # Возвращает список значение для вывода
 def forecast_weather_sparse_list(place_ls='Novosibirsk'):
     sparse_dict = forecast_weather_sparse_dict(place_ls)
-    if sparse_dict is None:
-        return None
+    # if sparse_dict is None:
+    #     return None
 
     ret_list = []
     for count in range(0, len(sparse_dict["day"]) - 1, 4):
@@ -174,9 +174,9 @@ if __name__ == '__main__':
     # weath_dict = weather(place)
     # str1 = "Температура: {0} C\nВлажность: {1}%\n".format(str(weath_dict['temperature']), str(weath_dict['humidity']))
     # print(str1)
-    rt_lst = forecast_weather_sparse_list()
+    rt_lst = forecast_weather_sparse_list(place)
 
-    print(rt_lst[0][1])
+    print(rt_lst[0])
     # print(rt_lst[1])
     # print(rt_lst[2])
     # print(rt_lst[3])

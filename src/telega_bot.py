@@ -45,6 +45,7 @@ def send_text(message):
     elif message.text.lower() == "прогноз":
         bot.send_message(message.chat.id, "Прогноз")
         rt_lst = getw.forecast_weather_sparse_list()
+        bot.send_message(message.chat.id, type(rt_lst))
         bot.send_message(message.chat.id, len(rt_lst))
         bot.send_message(message.chat.id, rt_lst[0][1])
         # bot.send_message(message.chat.id, rt_lst[1])
@@ -53,14 +54,10 @@ def send_text(message):
         # bot.send_message(message.chat.id, rt_lst[4])
     elif message.text.lower() == "курс":
         curr = currencies.get_currencies_pair()
-        ans1 = "Курс валют на: {0}\nДоллар: {1}\nЕвро: {2}\nЮань: {3}\n".format(str(curr['time']),
-                                                                                str(curr['usd']),
-                                                                                str(curr['eur']),
-                                                                                str(curr['cny']))
-        ans2 = "Фунт: {0}\nГривна: {1}\nБел.руб.: {2}\nБиткоин: {3}$".format(str(curr['gbp']),
-                                                                             str(curr['uah']),
-                                                                             str(curr['byn']),
-                                                                             str(curr['btc']))
+        ans1 = "Курс валют на: {0}\nДоллар: {1}\nЕвро: {2}\nЮань: {3}\n".format(str(curr['time']), str(curr['usd']),
+                                                                                str(curr['eur']), str(curr['cny']))
+        ans2 = "Фунт: {0}\nГривна: {1}\nБел.руб.: {2}\nБиткоин: {3}$".format(str(curr['gbp']), str(curr['uah']),
+                                                                             str(curr['byn']), str(curr['btc']))
         bot.send_message(message.chat.id, ans1 + ans2)
 
     else:                                          # Повторяет сообщение в ответ
