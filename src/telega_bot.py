@@ -7,6 +7,8 @@ import getweather as getw
 import currencies
 import stickerlist
 
+HEROKU = True
+
 # Создаем бота
 bot = tb.TeleBot(config.TOKEN_TELEGRAM)
 
@@ -105,7 +107,7 @@ def get_weather(place):
 
 # Заходим в настройки приложения в Хероку и видим пункт "Config Variables".
 # И добавляем туда переменную HEROKU, чтобы наш бот отличал - запущен он на сервере или на локальной машине
-if "HEROKU" in list(os.environ.keys()):
+if HEROKU is True:
     server = Flask(__name__)
 
     @server.route("/" + config.TOKEN_TELEGRAM, methods=['POST'])
