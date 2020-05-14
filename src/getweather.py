@@ -154,16 +154,16 @@ def forecast_weather_sparse_list(place_ls='Novosibirsk'):
             str(sparse_dict["day"][count]),
             str(sparse_dict["month"][count]),
             sparse_dict["day_time"][count],
-            str(sparse_dict["temperature"][count]),
+            str(int(sparse_dict["temperature"][count])),
             sparse_dict["detailed_status"][count],
             sparse_dict["day_time"][count + 1],
-            str(sparse_dict["temperature"][count + 1]),
+            str(int(sparse_dict["temperature"][count + 1])),
             sparse_dict["detailed_status"][count + 1],
             sparse_dict["day_time"][count + 2],
-            str(sparse_dict["temperature"][count + 2]),
+            str(int(sparse_dict["temperature"][count + 2])),
             sparse_dict["detailed_status"][count + 2],
             sparse_dict["day_time"][count + 3],
-            str(sparse_dict["temperature"][count + 3]),
+            str(int(sparse_dict["temperature"][count + 3])),
             sparse_dict["detailed_status"][count + 3]))
 
     return ret_list

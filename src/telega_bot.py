@@ -9,7 +9,7 @@ import currencies
 # Создаем бота
 bot = tb.TeleBot(config.TOKEN_TELEGRAM)
 
-server = Flask(__name__)
+# server = Flask(__name__)
 
 
 # Если послать боту комманду /start то отправит сообщение
@@ -43,15 +43,12 @@ def send_text(message):
 
         bot.send_message(message.chat.id, "Где смотрим погоду?", reply_markup=keyboard)
     elif message.text.lower() == "прогноз":
-        bot.send_message(message.chat.id, "Прогноз")
         rt_lst = getw.forecast_weather_sparse_list()
-        bot.send_message(message.chat.id, type(rt_lst))
-        bot.send_message(message.chat.id, len(rt_lst))
-        bot.send_message(message.chat.id, rt_lst[0][1])
-        # bot.send_message(message.chat.id, rt_lst[1])
-        # bot.send_message(message.chat.id, rt_lst[2])
-        # bot.send_message(message.chat.id, rt_lst[3])
-        # bot.send_message(message.chat.id, rt_lst[4])
+        bot.send_message(message.chat.id, rt_lst[0])
+        bot.send_message(message.chat.id, rt_lst[1])
+        bot.send_message(message.chat.id, rt_lst[2])
+        bot.send_message(message.chat.id, rt_lst[3])
+        bot.send_message(message.chat.id, rt_lst[4])
     elif message.text.lower() == "курс":
         curr = currencies.get_currencies_pair()
         ans1 = "Курс валют на: {0}\nДоллар: {1}\nЕвро: {2}\nЮань: {3}\n".format(str(curr['time']), str(curr['usd']),
@@ -135,18 +132,46 @@ def get_weather(place):
     return str0 + str1 + str2 + str3
 
 
-@server.route("/" + config.TOKEN_TELEGRAM, methods=['POST'])
-def getMessage():
-    bot.process_new_updates([tb.types.Update.de_json(request.stream.read().decode("utf-8"))])
-    return "!", 200
-
-
-@server.route("/")
-def webhook():
-    bot.remove_webhook()
-    bot.set_webhook(url="https://young-hamlet-55059.herokuapp.com/" + config.TOKEN_TELEGRAM)
-    return "!", 200
-
-
-if __name__ == "__main__":
+######################
+# Заходим в настройки приложения в Хероку и видим пункт "Config Variables".
+# И добавляем туда переменную HEROKU, чтобы наш бот отличал - запущен он на сервере или на локальной машине
+if "HEROKU" in list(os.environ.keys()):
+    server = Flask(__name__)
+    @server.route("/" + config.TOKEN_TELEGRAM, methods=['POST'])
+    def getMessage():
+        bot.process_new_updates([tb.types.Update.de_json(request.stream.read().decode("utf-8"))])
+        return "!", 200
+    @server.route("/")
+    def webhook():
+        bot.remove_webhook()
+        bot.set_webhook(url="https://young-hamlet-55059.herokuapp.com/" + config.TOKEN_TELEGRAM)
+        return "!", 200
     server.run(host="0.0.0.0", port=int(os.environ.get('PORT', 5000)), debug=False)
+else:
+    # если переменной окружения HEROKU нету, значит это запуск с машины разработчика.
+    # Удаляем вебхук на всякий случай, и запускаем с обычным поллингом.
+    bot.remove_webhook()
+    bot.polling(none_stop=True)
+
+
+
+
+#################
+
+#
+#
+# @server.route("/" + config.TOKEN_TELEGRAM, methods=['POST'])
+# def getMessage():
+#     bot.process_new_updates([tb.types.Update.de_json(request.stream.read().decode("utf-8"))])
+#     return "!", 200
+#
+#
+# @server.route("/")
+# def webhook():
+#     bot.remove_webhook()
+#     bot.set_webhook(url="https://young-hamlet-55059.herokuapp.com/" + config.TOKEN_TELEGRAM)
+#     return "!", 200
+#
+#
+# if __name__ == "__main__":
+#     server.run(host="0.0.0.0", port=int(os.environ.get('PORT', 5000)), debug=False)
