@@ -12,8 +12,7 @@ bot = tb.TeleBot(config.TOKEN_TELEGRAM)
 server = Flask(__name__)
 
 
-# Если послать боту комманду /start
-# то отправит сообщение и покажет клавиатуру с кнопками
+# Если послать боту комманду /start то отправит сообщение
 @bot.message_handler(commands=['start', 'help'])
 def start_message(message):
     if message.text == "/start":
@@ -44,8 +43,10 @@ def send_text(message):
 
         bot.send_message(message.chat.id, "Где смотрим погоду?", reply_markup=keyboard)
     elif message.text.lower() == "прогноз":
+        bot.send_message(message.chat.id, "Прогноз")
         rt_lst = getw.forecast_weather_sparse_list()
-        bot.send_message(message.chat.id, rt_lst[0])
+        bot.send_message(message.chat.id, len(rt_lst))
+        bot.send_message(message.chat.id, rt_lst[0][1])
         # bot.send_message(message.chat.id, rt_lst[1])
         # bot.send_message(message.chat.id, rt_lst[2])
         # bot.send_message(message.chat.id, rt_lst[3])
@@ -135,9 +136,6 @@ def get_weather(place):
     str3 = "UV-индекс: {0}\nUV-риск: {1}\n".format(str(weath_dict['uv_val']),
                                                    str(weath_dict['uv_risk']))
     return str0 + str1 + str2 + str3
-
-
-# bot.polling()
 
 
 @server.route("/" + config.TOKEN_TELEGRAM, methods=['POST'])

@@ -176,9 +176,9 @@ if __name__ == '__main__':
     # print(str1)
     rt_lst = forecast_weather_sparse_list()
 
-    print(rt_lst[0])
-    print(rt_lst[1])
-    print(rt_lst[2])
-    print(rt_lst[3])
-    print(rt_lst[4])
+    print(rt_lst[0][1])
+    # print(rt_lst[1])
+    # print(rt_lst[2])
+    # print(rt_lst[3])
+    # print(rt_lst[4])
 
