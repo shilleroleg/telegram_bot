@@ -7,12 +7,10 @@ import getweather as getw
 import currencies
 import stickerlist
 
-HEROKU = True
+HEROKU = False
 
 # Создаем бота
 bot = tb.TeleBot(config.TOKEN_TELEGRAM)
-
-# server = Flask(__name__)
 
 
 # Если послать боту комманду /start то отправит сообщение
@@ -105,8 +103,7 @@ def get_weather(place):
     return str0 + str1 + str2 + str3
 
 
-# Заходим в настройки приложения в Хероку и видим пункт "Config Variables".
-# И добавляем туда переменную HEROKU, чтобы наш бот отличал - запущен он на сервере или на локальной машине
+# Переменная HEROKU, чтобы наш бот отличал - запущен он на сервере или на локальной машине
 if HEROKU is True:
     server = Flask(__name__)
 
@@ -122,7 +119,7 @@ if HEROKU is True:
         return "!", 200
     server.run(host="0.0.0.0", port=int(os.environ.get('PORT', 5000)), debug=False)
 else:
-    # если переменной окружения HEROKU нету, значит это запуск с машины разработчика.
+    # Если переменная HEROKU == False, значит это запуск с машины разработчика.
     # Удаляем вебхук на всякий случай, и запускаем с обычным поллингом.
     bot.remove_webhook()
     bot.polling(none_stop=True)
