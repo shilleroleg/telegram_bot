@@ -131,7 +131,7 @@ def get_weather(place='Novosibirsk'):
 
 
 # Переменная HEROKU, чтобы наш бот отличал - запущен он на сервере или на локальной машине
-if HEROKU is True:
+if HEROKU:
     server = Flask(__name__)
 
     @server.route("/" + config.TOKEN_TELEGRAM, methods=['POST'])
