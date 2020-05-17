@@ -6,8 +6,11 @@ def sql_connection():
     try:
         # Для выполнения операторов SQLite3 сначала устанавливается соединение c базой
         # Cоздаeм базу данных в оперативной памяти
-        # con = sqlite3.connect(':memory:')
-        con = sqlite3.connect('mydatabase.db')
+        #  By default, check_same_thread is True and only the creating thread may use the connection.
+        #  If set False, the returned connection may be shared across multiple threads.
+        #  When using multiple threads with the same connection writing operations should be serialized
+        #  by the user to avoid data corruption
+        con = sqlite3.connect('mydatabase.db', check_same_thread=False)
         print("Connection is established: Database is created")
         return con
 
@@ -18,62 +21,73 @@ def sql_connection():
 def sql_create_table(connect):
     #  Cоздается объект курсора с использованием объекта соединения
     cursor_obj = connect.cursor()
-    cursor_obj.execute("CREATE TABLE IF NOT EXISTS employees("
+    cursor_obj.execute("CREATE TABLE IF NOT EXISTS weather("
                        "id integer PRIMARY KEY,"
-                       "name text,"
-                       "salary real,"
-                       "department text,"
-                       "position text,"
-                       "hireDate text)")
+                       "weather_flag integer)")
     # Метод commit() сохраняет все сделанные изменения
     connect.commit()
 
 
 def sql_insert(connect, entities):
     cursor_obj = connect.cursor()
-    cursor_obj.execute('INSERT OR IGNORE INTO employees('
+    cursor_obj.execute('INSERT OR IGNORE INTO weather('
                        'id,'
-                       'name,'
-                       'salary,'
-                       'department,'
-                       'position,'
-                       'hireDate) VALUES(?, ?, ?, ?, ?, ?)', entities)
+                       'weather_flag) VALUES(?, ?)', entities)
     connect.commit()
 
 
-def sql_update(connect):
+def sql_update(connect, val, id_for_upd):
     # Для обновления будем использовать инструкцию UPDATE.
     # Также воспользуемся предикатом WHERE в качестве условия для выбора нужного сотрудника.
     cursor_obj = connect.cursor()
-    cursor_obj.execute('UPDATE employees SET name = "Rogers" where id = 2')
+    string_for_update = 'UPDATE weather SET weather_flag = ' + str(val) + ' where id = ' + str(id_for_upd)
+    print(string_for_update)
+    cursor_obj.execute('UPDATE weather SET weather_flag = ' + str(val) + ' where id = ' + str(id_for_upd))
     connect.commit()
 
 
 def sql_select(connect):
     cursor_obj = connect.cursor()
     #  извлекаем данные из БД
-    cursor_obj.execute('SELECT * FROM employees')
+    cursor_obj.execute('SELECT * FROM weather')
     # сохраняем данные в переменную
     table = cursor_obj.fetchall()
     return table
+
+
+def sql_select_flag(connect, id_for_flag):
+    cursor_obj = connect.cursor()
+    #  извлекаем данные из БД
+    cursor_obj.execute('SELECT weather_flag FROM weather where id = ' + str(id_for_flag))
+    # сохраняем данные в переменную
+    flag = cursor_obj.fetchall()
+    if len(flag) > 0:
+        return flag[0][0]
+    else:
+        return None
+
 
 if __name__ == "__main__":
     con = sql_connection()
     sql_create_table(con)
 
     # Вставляем значения
-    entities1 = (1, 'John', 700, 'HR', 'Manager', '2017-01-04')
-    entities2 = (2, 'Andrew', 800, 'IT', 'Tech', '2018-02-06')
-    entities3 = (3, 'Alise', 900, 'IT', 'Tech', '2019-03-07')
+    entities1 = (1, 0)
+    entities2 = (2, 0)
+    entities3 = (3, 0)
     sql_insert(con, entities1)
     sql_insert(con, entities2)
     sql_insert(con, entities3)
-    # Изменяем имя Эндрю на Роджерс.
-    sql_update(con)
+    # Изменяем данные.
+    sql_update(con, 1, 2)
     # Извлекаем данные
     rows = sql_select(con)
     for row in rows:
         print(row)
+
+    #
+    flag = sql_select_flag(con, 2)
+    print(flag)
 
     # Закрываем соединение с базой
     con.close()

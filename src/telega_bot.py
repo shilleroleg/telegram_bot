@@ -1,4 +1,5 @@
 import telebot as tb
+from telebot import apihelper
 import os
 from flask import Flask, request
 from random import choice
@@ -6,17 +7,32 @@ import config
 import getweather as getw
 import currencies
 import stickerlist
+import sql_database as sd
 
 HEROKU = False
 
 # Создаем бота
+
+if not HEROKU:
+    # List proxy http://spys.one/proxys/US/  or  http://spys.one/socks/
+    # apihelper.proxy = {'https': 'socks5://35.198.246.77:808'}
+    # apihelper.proxy = {'https': 'socks5://181.102.135.183:1080'}
+    apihelper.proxy = {'https': 'socks5://47.241.16.16:1080'}
+
 bot = tb.TeleBot(config.TOKEN_TELEGRAM)
 
+# Create sql database, for storage FLAG for weather in other town
+con = sd.sql_connection()
+sd.sql_create_table(con)
 
 # Если послать боту комманду /start то отправит сообщение
 @bot.message_handler(commands=['start', 'help'])
 def start_message(message):
     if message.text == "/start":
+        # Initial insert data in base
+        entities = (message.from_user.id, 0)
+        sd.sql_insert(con, entities)
+        # ... and send message
         bot.send_message(message.chat.id, "Офигенски, погнали!")
     elif message.text == "/help":
         help_mess = """
@@ -43,6 +59,7 @@ def send_text(message):
         keyboard.add(item1, item2)
 
         bot.send_message(message.chat.id, "Где смотрим погоду?", reply_markup=keyboard)
+
     elif message.text.lower() == "прогноз":
         rt_lst = getw.forecast_weather_sparse_list()
         bot.send_message(message.chat.id, rt_lst[0])
@@ -58,6 +75,12 @@ def send_text(message):
                                                                              str(curr['byn']), str(curr['btc']))
         bot.send_message(message.chat.id, ans1 + ans2)
 
+    elif sd.sql_select_flag(con, message.from_user.id) == 1:  # Проверяем погоду в другом городе по flag из sql базы
+        # Set flag to 0
+        sd.sql_update(con, 0, message.from_user.id)
+        # Get weather
+        bot.send_message(message.chat.id, get_weather(message.text))
+
     else:                                          # Повторяет сообщение в ответ
         bot.send_message(message.chat.id, "Ты сказал - " + message.text + "?")
 
@@ -70,7 +93,11 @@ def callback_inline(call):
                 answer = get_weather('Novosibirsk')
                 bot.send_message(call.message.chat.id, answer)
             elif call.data == 'Other':
-                bot.send_message(call.message.chat.id, 'Холодно')
+                # Set flag to 1
+                #
+                sd.sql_update(con, 1, call.message.chat.id)
+
+                bot.send_message(call.message.chat.id, 'В каком городе смотрим погоду?')
 
             # remove inline buttons
             bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
@@ -90,7 +117,7 @@ def get_sticker(message):
     print(message.sticker.file_id)
 
 
-def get_weather(place):
+def get_weather(place='Novosibirsk'):
     weath_dict = getw.weather(place)
     str0 = place + " {0}\n".format(str(weath_dict['time']))
 
