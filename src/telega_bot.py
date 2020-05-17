@@ -9,7 +9,7 @@ import currencies
 import stickerlist
 import sql_database as sd
 
-HEROKU = False
+HEROKU = True
 
 # Создаем бота
 
