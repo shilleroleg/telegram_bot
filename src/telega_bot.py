@@ -13,11 +13,11 @@ HEROKU = True
 
 # Создаем бота
 
-if not HEROKU:
-    # List proxy http://spys.one/proxys/US/  or  http://spys.one/socks/
-    # apihelper.proxy = {'https': 'socks5://35.198.246.77:808'}
-    # apihelper.proxy = {'https': 'socks5://181.102.135.183:1080'}
-    apihelper.proxy = {'https': 'socks5://47.241.16.16:1080'}
+# Запускаем через прокси, если заблокировано
+# # List proxy http://spys.one/proxys/US/  or  http://spys.one/socks/
+# # apihelper.proxy = {'https': 'socks5://35.198.246.77:808'}
+# # apihelper.proxy = {'https': 'socks5://181.102.135.183:1080'}
+# apihelper.proxy = {'https': 'socks5://47.241.16.16:1080'}
 
 bot = tb.TeleBot(config.TOKEN_TELEGRAM)
 
