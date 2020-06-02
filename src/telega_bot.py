@@ -7,7 +7,6 @@ import config
 import getweather as getw
 import currencies
 import stickerlist
-import sql_database as sd
 
 HEROKU = True
 
@@ -17,22 +16,15 @@ HEROKU = True
 # # List proxy http://spys.one/proxys/US/  or  http://spys.one/socks/
 # # apihelper.proxy = {'https': 'socks5://35.198.246.77:808'}
 # # apihelper.proxy = {'https': 'socks5://181.102.135.183:1080'}
-# apihelper.proxy = {'https': 'socks5://47.241.16.16:1080'}
+# # apihelper.proxy = {'https': 'socks5://47.241.16.16:1080'}
 
 bot = tb.TeleBot(config.TOKEN_TELEGRAM)
 
-# Create sql database, for storage FLAG for weather in other town
-con = sd.sql_connection()
-sd.sql_create_table(con)
 
 # Если послать боту комманду /start то отправит сообщение
 @bot.message_handler(commands=['start', 'help'])
 def start_message(message):
     if message.text == "/start":
-        # Initial insert data in base
-        entities = (message.from_user.id, 0)
-        sd.sql_insert(con, entities)
-        # ... and send message
         bot.send_message(message.chat.id, "Офигенски, погнали!")
     elif message.text == "/help":
         help_mess = """
@@ -75,12 +67,6 @@ def send_text(message):
                                                                              str(curr['byn']), str(curr['btc']))
         bot.send_message(message.chat.id, ans1 + ans2)
 
-    elif sd.sql_select_flag(con, message.from_user.id) == 1:  # Проверяем погоду в другом городе по flag из sql базы
-        # Set flag to 0
-        sd.sql_update(con, 0, message.from_user.id)
-        # Get weather
-        bot.send_message(message.chat.id, get_weather(message.text))
-
     else:                                          # Повторяет сообщение в ответ
         bot.send_message(message.chat.id, "Ты сказал - " + message.text + "?")
 
@@ -93,22 +79,26 @@ def callback_inline(call):
                 answer = get_weather('Novosibirsk')
                 bot.send_message(call.message.chat.id, answer)
             elif call.data == 'Other':
-                # Set flag to 1
-                #
-                sd.sql_update(con, 1, call.message.chat.id)
-
-                bot.send_message(call.message.chat.id, 'В каком городе смотрим погоду?')
+                # Выводим запрос ввода
+                msg = bot.send_message(call.message.chat.id, 'В каком городе смотрим погоду?')
+                # И регистрируем следующий щаг, к которому перейти после ответа пользователя.
+                # Ответ пользователя передаем в функцию weather_another_town
+                bot.register_next_step_handler(msg, weather_another_town)
 
             # remove inline buttons
             bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                   text="Погода", reply_markup=None)
-
             # show alert
             bot.answer_callback_query(callback_query_id=call.id, show_alert=False,
-                                      text="ЭТО ТЕСТОВОЕ УВЕДОМЛЕНИЕ!")
+                                      text="Хорошая погода}")
 
     except Exception as e:
         print(repr(e))
+
+
+# Обрабатываем ответ пользователя и выводим погоду в другом городе
+def weather_another_town(message):
+    bot.send_message(message.chat.id, get_weather(message.text))
 
 
 # Бот при получении стикера печатает id стикера
