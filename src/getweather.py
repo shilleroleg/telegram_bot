@@ -1,6 +1,7 @@
 import pyowm
 import datetime as dt
-import config
+# import config
+import os
 
 # Current weather, minute forecast for 1 hour, hourly forecast for 48 hours,
 # daily forecast for 7 days, historical data for 5 previous days for any location
@@ -10,7 +11,7 @@ import config
 
 def weather(place='Novosibirsk'):
     try:
-        owm = pyowm.OWM(config.API_KEY_WEATHER, language='ru')
+        owm = pyowm.OWM(os.environ['API_KEY_WEATHER'], language='ru')
 
         # Search for current weather in place
         observation = owm.weather_at_place(place)
@@ -74,14 +75,13 @@ def weather(place='Novosibirsk'):
 def forecast_weather(place_fc='Novosibirsk'):
     # forecast
     try:
-        owm = pyowm.OWM(config.API_KEY_WEATHER, language='ru')
+        owm = pyowm.OWM(os.environ['API_KEY_WEATHER'], language='ru')
         # Query for 3 hours weather forecast for the next 5 days
         fc_3h = owm.three_hours_forecast(place_fc)
 
     except Exception as e:
         print(repr(e))
         return None
-
 
     forecast_3h = fc_3h.get_forecast()
 

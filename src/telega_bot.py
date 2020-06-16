@@ -3,22 +3,20 @@ from telebot import apihelper
 import os
 from flask import Flask, request
 from random import choice
-import config
+# import config
 import getweather as getw
 import currencies
 import stickerlist
 
 HEROKU = True
-
-# Создаем бота
-
 # Запускаем через прокси, если заблокировано
 # # List proxy http://spys.one/proxys/US/  or  http://spys.one/socks/
 # # apihelper.proxy = {'https': 'socks5://35.198.246.77:808'}
 # # apihelper.proxy = {'https': 'socks5://181.102.135.183:1080'}
 # # apihelper.proxy = {'https': 'socks5://47.241.16.16:1080'}
 
-bot = tb.TeleBot(config.TOKEN_TELEGRAM)
+# Создаем бота
+bot = tb.TeleBot(os.environ['TOKEN_TELEGRAM'])
 
 
 # Если послать боту комманду /start то отправит сообщение
@@ -55,10 +53,10 @@ def send_text(message):
     elif message.text.lower() == "прогноз":
         rt_lst = getw.forecast_weather_sparse_list()
         bot.send_message(message.chat.id, rt_lst[0])
-        bot.send_message(message.chat.id, rt_lst[1])
-        bot.send_message(message.chat.id, rt_lst[2])
-        bot.send_message(message.chat.id, rt_lst[3])
-        bot.send_message(message.chat.id, rt_lst[4])
+        # bot.send_message(message.chat.id, rt_lst[1])
+        # bot.send_message(message.chat.id, rt_lst[2])
+        # bot.send_message(message.chat.id, rt_lst[3])
+        # bot.send_message(message.chat.id, rt_lst[4])
     elif message.text.lower() == "курс":
         curr = currencies.get_currencies_pair()
         ans1 = "Курс валют на: {0}\nДоллар: {1}\nЕвро: {2}\nЮань: {3}\n".format(str(curr['time']), str(curr['usd']),
@@ -124,7 +122,7 @@ def get_weather(place='Novosibirsk'):
 if HEROKU:
     server = Flask(__name__)
 
-    @server.route("/" + config.TOKEN_TELEGRAM, methods=['POST'])
+    @server.route("/" + os.environ['TOKEN_TELEGRAM'], methods=['POST'])
     def getMessage():
         bot.process_new_updates([tb.types.Update.de_json(request.stream.read().decode("utf-8"))])
         return "!", 200
@@ -132,11 +130,16 @@ if HEROKU:
     @server.route("/")
     def webhook():
         bot.remove_webhook()
-        bot.set_webhook(url="https://young-hamlet-55059.herokuapp.com/" + config.TOKEN_TELEGRAM)
+        bot.set_webhook(url="https://young-hamlet-55059.herokuapp.com/" + os.environ['TOKEN_TELEGRAM'])
         return "!", 200
     server.run(host="0.0.0.0", port=int(os.environ.get('PORT', 5000)), debug=False)
+    # Manual register webhook
+    # https://api.telegram.org/bot<bot_token>/setWebhook?url=https://young-hamlet-55059.herokuapp.com/
+
 else:
     # Если переменная HEROKU == False, значит это запуск с машины разработчика.
     # Удаляем вебхук на всякий случай, и запускаем с обычным поллингом.
     bot.remove_webhook()
     bot.polling(none_stop=True)
+
+
