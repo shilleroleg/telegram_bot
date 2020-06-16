@@ -1,4 +1,4 @@
 /.idea
 /venv
 src/mydatabase.db
-config.py
+src/config.py

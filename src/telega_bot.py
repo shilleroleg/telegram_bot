@@ -3,7 +3,6 @@ from telebot import apihelper
 import os
 from flask import Flask, request
 from random import choice
-# import config
 import getweather as getw
 import currencies
 import stickerlist

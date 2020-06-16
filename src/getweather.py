@@ -1,6 +1,5 @@
 import pyowm
 import datetime as dt
-# import config
 import os
 
 # Current weather, minute forecast for 1 hour, hourly forecast for 48 hours,
